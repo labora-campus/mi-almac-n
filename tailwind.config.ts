@@ -47,6 +47,25 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        success: {
+          DEFAULT: "hsl(var(--success))",
+          foreground: "hsl(var(--success-foreground))",
+        },
+        warning: {
+          DEFAULT: "hsl(var(--warning))",
+          foreground: "hsl(var(--warning-foreground))",
+        },
+        cat: {
+          bebidas: "hsl(var(--cat-bebidas))",
+          lacteos: "hsl(var(--cat-lacteos))",
+          almacen: "hsl(var(--cat-almacen))",
+          limpieza: "hsl(var(--cat-limpieza))",
+          golosinas: "hsl(var(--cat-golosinas))",
+          fiambreria: "hsl(var(--cat-fiambreria))",
+          panaderia: "hsl(var(--cat-panaderia))",
+          verduleria: "hsl(var(--cat-verduleria))",
+          otros: "hsl(var(--cat-otros))",
+        },
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
           foreground: "hsl(var(--sidebar-foreground))",
@@ -65,20 +84,12 @@ export default {
       },
       keyframes: {
         "accordion-down": {
-          from: {
-            height: "0",
-          },
-          to: {
-            height: "var(--radix-accordion-content-height)",
-          },
+          from: { height: "0" },
+          to: { height: "var(--radix-accordion-content-height)" },
         },
         "accordion-up": {
-          from: {
-            height: "var(--radix-accordion-content-height)",
-          },
-          to: {
-            height: "0",
-          },
+          from: { height: "var(--radix-accordion-content-height)" },
+          to: { height: "0" },
         },
       },
       animation: {
