@@ -9,7 +9,7 @@ import { ArrowLeft, LogOut, UserPlus, Crown, User } from 'lucide-react';
 import { toast } from 'sonner';
 
 export default function Configuracion() {
-  const { almacenName, almacenAddress, logout } = useApp();
+  const { almacenName, almacenAddress, logout, seedDatabase } = useApp();
   const navigate = useNavigate();
   const [name, setName] = useState(almacenName);
   const [address, setAddress] = useState(almacenAddress);
@@ -69,6 +69,23 @@ export default function Configuracion() {
             <UserPlus size={14} /> Invitar empleado
           </Button>
           <p className="text-xs text-muted-foreground">Los empleados pueden registrar ventas y ver productos. Solo el dueño puede ver reportes y editar precios.</p>
+        </CardContent>
+      </Card>
+
+      {/* Database */}
+      <Card className="border-0 shadow-sm">
+        <CardContent className="p-4 space-y-4">
+          <h3 className="text-sm font-semibold text-foreground">Base de Datos</h3>
+          <p className="text-xs text-muted-foreground">
+            Cargá productos de prueba para empezar rápido. Solo funciona si la base de datos está vacía.
+          </p>
+          <Button
+            variant="secondary"
+            onClick={seedDatabase}
+            className="w-full h-10 text-sm font-semibold"
+          >
+            Cargar productos de ejemplo
+          </Button>
         </CardContent>
       </Card>
 

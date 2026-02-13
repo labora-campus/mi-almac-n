@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react';
 import { useApp } from '@/context/AppContext';
 import { Card, CardContent } from '@/components/ui/card';
-import { formatCurrency } from '@/lib/format';
+import { formatCurrency, formatDate } from '@/lib/format';
 import { generateDailySummaries } from '@/data/mockData';
 import { TrendingUp, TrendingDown, Download } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -14,18 +14,51 @@ type Period = 'hoy' | 'semana' | 'mes';
 const PAYMENT_COLORS = ['hsl(152, 55%, 38%)', 'hsl(210, 80%, 45%)', 'hsl(38, 92%, 50%)', 'hsl(340, 65%, 52%)'];
 
 export default function Reportes() {
-  const { ventas } = useApp();
+  const { ventas, productos } = useApp();
   const [period, setPeriod] = useState<Period>('semana');
 
-  const dailySummaries = useMemo(() => generateDailySummaries(), []);
+  const processedData = useMemo(() => {
+    const dailyMap: Record<string, { date: string; label: string; total: number; profit: number; count: number }> = {};
+    const today = new Date();
+
+    // Initialize last 30 days
+    for (let i = 29; i >= 0; i--) {
+      const d = new Date(today);
+      d.setDate(d.getDate() - i);
+      const dateStr = d.toISOString().split('T')[0];
+      // Simple label: DD/MM
+      const label = d.getDate().toString().padStart(2, '0') + '/' + (d.getMonth() + 1).toString().padStart(2, '0');
+      dailyMap[dateStr] = { date: dateStr, label, total: 0, profit: 0, count: 0 };
+    }
+
+    ventas.forEach(sale => {
+      const dateStr = new Date(sale.date).toISOString().split('T')[0];
+      if (dailyMap[dateStr]) {
+        dailyMap[dateStr].total += sale.total;
+        dailyMap[dateStr].count += 1;
+
+        // Calculate profit (approximate based on current cost)
+        let saleCost = 0;
+        sale.items.forEach(item => {
+          const product = productos.find(p => p.id === item.productId);
+          if (product) {
+            saleCost += product.costPrice * item.quantity;
+          }
+        });
+        dailyMap[dateStr].profit += (sale.total - saleCost);
+      }
+    });
+
+    return Object.values(dailyMap).sort((a, b) => a.date.localeCompare(b.date));
+  }, [ventas, productos]);
 
   const periodData = useMemo(() => {
     switch (period) {
-      case 'hoy': return dailySummaries.slice(-1);
-      case 'semana': return dailySummaries.slice(-7);
-      case 'mes': return dailySummaries;
+      case 'hoy': return processedData.slice(-1);
+      case 'semana': return processedData.slice(-7);
+      case 'mes': return processedData;
     }
-  }, [period, dailySummaries]);
+  }, [period, processedData]);
 
   const totalSales = periodData.reduce((s, d) => s + d.total, 0);
   const totalProfit = periodData.reduce((s, d) => s + d.profit, 0);
@@ -35,33 +68,57 @@ export default function Reportes() {
   // Previous period comparison
   const prevData = useMemo(() => {
     const len = periodData.length;
-    const start = dailySummaries.length - len * 2;
+    const allLen = processedData.length;
+    const end = allLen - len;
+    const start = end - len;
     if (start < 0) return [];
-    return dailySummaries.slice(start, start + len);
-  }, [periodData, dailySummaries]);
+    return processedData.slice(Math.max(0, start), end);
+  }, [periodData.length, processedData]);
 
   const prevTotal = prevData.reduce((s, d) => s + d.total, 0);
-  const changePercent = prevTotal > 0 ? ((totalSales - prevTotal) / prevTotal * 100).toFixed(1) : '0';
+  const changePercent = prevTotal > 0 ? ((totalSales - prevTotal) / prevTotal * 100).toFixed(1) : '100';
   const isUp = totalSales >= prevTotal;
 
-  // Payment method breakdown (simulated)
-  const paymentBreakdown = [
-    { name: 'Efectivo', value: 45, pct: '45%' },
-    { name: 'Transferencia', value: 25, pct: '25%' },
-    { name: 'Tarjeta', value: 20, pct: '20%' },
-    { name: 'Fiado', value: 10, pct: '10%' },
-  ];
+  // Payment method breakdown
+  const paymentBreakdown = useMemo(() => {
+    const map: Record<string, number> = { 'efectivo': 0, 'transferencia': 0, 'tarjeta': 0, 'fiado': 0 };
+    let total = 0;
+    ventas.forEach(v => {
+      // Filter by period? Usually reports show breakdown for selected period
+      // Let's filter by period to be consistent
+      const dateStr = new Date(v.date).toISOString().split('T')[0];
+      const isInPeriod = periodData.some(d => d.date === dateStr); // Simple check
+      if (isInPeriod) {
+        map[v.paymentMethod] = (map[v.paymentMethod] || 0) + v.total;
+        total += v.total;
+      }
+    });
 
-  // Top products (simulated from today's sales)
+    return [
+      { name: 'Efectivo', value: map['efectivo'], pct: total > 0 ? Math.round(map['efectivo'] / total * 100) + '%' : '0%' },
+      { name: 'Transf.', value: map['transferencia'], pct: total > 0 ? Math.round(map['transferencia'] / total * 100) + '%' : '0%' },
+      { name: 'Tarjeta', value: map['tarjeta'], pct: total > 0 ? Math.round(map['tarjeta'] / total * 100) + '%' : '0%' },
+      { name: 'Fiado', value: map['fiado'], pct: total > 0 ? Math.round(map['fiado'] / total * 100) + '%' : '0%' },
+    ].filter(i => i.value > 0);
+  }, [ventas, periodData]);
+
+  // Top products
   const topProducts = useMemo(() => {
     const map: Record<string, { name: string; qty: number; total: number }> = {};
-    ventas.forEach(v => v.items.forEach(i => {
-      if (!map[i.productId]) map[i.productId] = { name: i.productName, qty: 0, total: 0 };
-      map[i.productId].qty += i.quantity;
-      map[i.productId].total += i.subtotal;
-    }));
+    ventas.forEach(v => {
+      const dateStr = new Date(v.date).toISOString().split('T')[0];
+      const isInPeriod = periodData.some(d => d.date === dateStr);
+
+      if (isInPeriod) {
+        v.items.forEach(i => {
+          if (!map[i.productId]) map[i.productId] = { name: i.productName, qty: 0, total: 0 };
+          map[i.productId].qty += i.quantity;
+          map[i.productId].total += i.subtotal;
+        });
+      }
+    });
     return Object.values(map).sort((a, b) => b.qty - a.qty).slice(0, 8);
-  }, [ventas]);
+  }, [ventas, periodData]);
 
   const maxQty = topProducts.length > 0 ? topProducts[0].qty : 1;
 

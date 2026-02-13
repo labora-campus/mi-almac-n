@@ -13,6 +13,8 @@ export interface Product {
   stock: number;
   minStock: number;
   unit: Unit;
+  barcode?: string;
+  image?: string;
 }
 
 export interface SaleItem {

@@ -21,9 +21,13 @@ export default function Onboarding() {
     setCategories(prev => prev.includes(cat) ? prev.filter(c => c !== cat) : [...prev, cat]);
   };
 
-  const handleFinish = () => {
-    completeOnboarding(name || 'Mi Almacén', address, categories);
-    navigate('/dashboard');
+  const handleFinish = async () => {
+    try {
+      await completeOnboarding(name || 'Mi Almacén', address, categories);
+      navigate('/dashboard');
+    } catch (error) {
+      console.error('Error in onboarding:', error);
+    }
   };
 
   return (

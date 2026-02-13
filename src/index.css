@@ -13,24 +13,24 @@
     --popover: 0 0% 100%;
     --popover-foreground: 220 15% 15%;
 
-    --primary: 152 55% 38%;
-    --primary-foreground: 0 0% 100%;
+    --primary: 262.1 83.3% 57.8%;
+    --primary-foreground: 210 40% 98%;
 
-    --secondary: 152 20% 93%;
-    --secondary-foreground: 152 55% 25%;
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
 
     --muted: 40 10% 93%;
     --muted-foreground: 220 10% 45%;
 
-    --accent: 38 92% 50%;
-    --accent-foreground: 38 92% 15%;
+    --accent: 262.1 83.3% 95%;
+    --accent-foreground: 262.1 83.3% 40%;
 
     --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
 
     --border: 220 10% 88%;
     --input: 220 10% 88%;
-    --ring: 152 55% 38%;
+    --ring: 262.1 83.3% 57.8%;
 
     --radius: 0.75rem;
 
@@ -66,19 +66,19 @@
     --card-foreground: 40 20% 95%;
     --popover: 220 15% 13%;
     --popover-foreground: 40 20% 95%;
-    --primary: 152 55% 45%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 152 20% 18%;
-    --secondary-foreground: 152 40% 80%;
+    --primary: 263.4 70% 50.4%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
     --muted: 220 10% 18%;
     --muted-foreground: 220 10% 60%;
-    --accent: 38 80% 45%;
-    --accent-foreground: 38 80% 90%;
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
     --destructive: 0 62% 40%;
     --destructive-foreground: 0 0% 100%;
     --border: 220 10% 20%;
     --input: 220 10% 20%;
-    --ring: 152 55% 45%;
+    --ring: 263.4 70% 50.4%;
     --success: 152 55% 45%;
     --success-foreground: 0 0% 100%;
     --warning: 38 80% 45%;
@@ -107,8 +107,8 @@
   }
 
   @keyframes fab-pulse {
-    0%, 100% { box-shadow: 0 4px 15px hsl(152 55% 38% / 0.4); }
-    50% { box-shadow: 0 4px 25px hsl(152 55% 38% / 0.65); }
+    0%, 100% { box-shadow: 0 4px 15px hsl(262.1 83.3% 57.8% / 0.4); }
+    50% { box-shadow: 0 4px 25px hsl(262.1 83.3% 57.8% / 0.65); }
   }
   .animate-fab-pulse {
     animation: fab-pulse 2s ease-in-out infinite;

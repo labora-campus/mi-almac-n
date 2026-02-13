@@ -1,23 +1,45 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useApp } from '@/context/AppContext';
+import { supabase } from '@/lib/supabase';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent } from '@/components/ui/card';
+import { toast } from 'sonner';
 import logo from '@/assets/logo.png';
 
 export default function Login() {
-  const { login } = useApp();
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isRegister, setIsRegister] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    login();
-    navigate('/onboarding');
+    setLoading(true);
+
+    try {
+      if (isRegister) {
+        const { error } = await supabase.auth.signUp({
+          email,
+          password,
+        });
+        if (error) throw error;
+        toast.success('Cuenta creada. Por favor verificá tu email.');
+      } else {
+        const { error } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
+        if (error) throw error;
+        // User will be redirected by AuthWrapper/Guard
+      }
+    } catch (error: any) {
+      toast.error(error.message || 'Ocurrió un error');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -62,8 +84,8 @@ export default function Login() {
                 />
               </div>
 
-              <Button type="submit" className="w-full h-12 text-base font-semibold">
-                {isRegister ? 'Registrarme' : 'Entrar'}
+              <Button type="submit" className="w-full h-12 text-base font-semibold" disabled={loading}>
+                {loading ? 'Cargando...' : (isRegister ? 'Registrarme' : 'Entrar')}
               </Button>
             </form>
           </CardContent>

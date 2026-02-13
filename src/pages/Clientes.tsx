@@ -21,8 +21,8 @@ export default function Clientes() {
   const totalDebt = clientes.reduce((s, c) => s + c.debt, 0);
   const sorted = [...clientes].sort((a, b) => b.debt - a.debt);
 
-  const handleAdd = () => {
-    addClient(name, phone);
+  const handleAdd = async () => {
+    await addClient(name, phone);
     setShowAdd(false);
     setName('');
     setPhone('');

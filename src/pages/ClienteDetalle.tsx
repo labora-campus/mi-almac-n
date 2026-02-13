@@ -19,8 +19,8 @@ export default function ClienteDetalle() {
 
   if (!client) return <div className="p-6 text-center text-muted-foreground">Cliente no encontrado</div>;
 
-  const handlePay = () => {
-    registerPayment(client.id, Number(payAmount));
+  const handlePay = async () => {
+    await registerPayment(client.id, Number(payAmount));
     toast.success('Pago registrado');
     setShowPay(false);
     setPayAmount('');

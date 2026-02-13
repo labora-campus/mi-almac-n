@@ -34,14 +34,14 @@ export default function NuevaVenta() {
     return productos.filter(p => p.name.toLowerCase().includes(q)).slice(0, 6);
   }, [search, productos]);
 
-  const handleConfirm = () => {
+  const handleConfirm = async () => {
     let clientId = selectedClientId;
     if (paymentMethod === 'fiado' && showNewClient && newClientName.trim()) {
-      const newC = addClient(newClientName, newClientPhone);
+      const newC = await addClient(newClientName, newClientPhone);
       clientId = newC.id;
     }
 
-    addSale({
+    await addSale({
       date: new Date().toISOString(),
       items: cart.map(i => ({
         productId: i.product.id,
@@ -54,6 +54,7 @@ export default function NuevaVenta() {
       paymentMethod,
       clientId: paymentMethod === 'fiado' ? clientId : undefined,
     });
+
     clearCart();
     setStep('success');
     toast.success('¡Venta registrada!');
